@@ -8,6 +8,7 @@ if __name__ == '__main__':
     data = np.loadtxt('ex2data2.txt', delimiter = ',')
     X = data[:,0:2]
     y = data[:,2]
+    m = y.shape[0]
 
     plotData(X, y)
     plt.xlabel('Microchip Test 1')
@@ -59,7 +60,6 @@ if __name__ == '__main__':
 
 ## ============== Part 4: Predict and Accuracies ==============
     # Compute accuracy on our training set
-    prob = sigmoid(np.matmul(np.array([1, 45, 85]), theta))
     p = predict(theta, X)
 
     print("Training accuracy: %.3f" % (np.mean(p == np.reshape(y, [m, 1])) * 100))

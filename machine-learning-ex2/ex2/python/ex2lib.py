@@ -15,10 +15,10 @@ def mapFeature(X1, X2):
     degree = 6
     if type(X1) != np.ndarray:
         X1 = np.array([X1])
-    s = len(X1)
+    s = X1.shape[0]
     out = np.ones([s, 1])
-    for i in range(1, degree + 1):
-        for j in range(i):
+    for i in range(1, degree + 1):  # Note the [1, degree] range
+        for j in range(i + 1):      # Note the [0, i] range
             o = np.reshape((X1**(i - j)) * (X2**j), [s, 1])
             out = np.concatenate((out, o), axis = 1)
     return out
@@ -26,8 +26,8 @@ def mapFeature(X1, X2):
 # Plots the data points X and y into a new figure with the decision boundary
 # defined by theta
 def plotDecisionBoundary(theta, X, y):
-    plotData(X[:,1:], y)
-    if np.shape(X)[1] <= 3:
+    plotData(X[:,1:3], y)
+    if X.shape[1] <= 3:
         # Only need 2 points to define a line, so choose two endpoints
         plot_x = np.array([min(X[:,1]) - 2, max(X[:,1]) + 2])
 
