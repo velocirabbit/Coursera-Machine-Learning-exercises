@@ -9,17 +9,12 @@ def displayData(X, example_width = 0):
     if (example_width == 0):
         if (np.ndim(X) == 1):
             X = np.matrix(X)
-            X = np.reshape(X, [X.shape[1], 1])
         example_width = int(round(np.sqrt(X.shape[1])))
 
     cmap = 'gray'
 
     # Compute rows, cols
-    if (np.ndim(X) == 1):
-        m = 1
-        n = X.shape[0]
-    else:
-        m, n = X.shape
+    m, n = X.shape
     example_height = int((n / example_width))
 
     # Compute number of items to display
@@ -43,12 +38,12 @@ def displayData(X, example_width = 0):
             
             # Copy the patch
             # Get the max value of the patch
-            max_val = max(abs(X[curr_ex,:]))
+            max_val = np.max(abs(X[curr_ex,:]))
             hpad = pad + (j - 1) * (example_height + pad)
             wpad = pad + (i - 1) * (example_width + pad)
             eheight = np.array([hpad + h for h in range(example_height)])
             ewidth = np.array([wpad + w for w in range(example_width)])
-            
+
             imgex = np.reshape(X[curr_ex,:], [example_width, example_height]) / max_val
             
             # Need to rotate image due to how MATLAB indexes things
@@ -147,4 +142,4 @@ def predict(Theta1, Theta2, X):
     # p is a vector of the indices of the largest values (what we want)
     p = np.argmax(sigmoid(np.matmul(a2, np.transpose(Theta2))), axis = 1)
     
-    return p
+    return p + 1  # +1 because Python is 0-indexed

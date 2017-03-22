@@ -35,8 +35,7 @@ if __name__ == '__main__':
 
 ## ================= Part 3: Implement Predict =================
     pred = predict(Theta1, Theta2, X)
-    print("Training set accuracy: %.3f%%" % (np.mean(pred == np.reshape(y, [m, 1])) * 100))
-
+    print("Training set accuracy: %.3f%%" % (np.mean(pred == y) * 100))
     input("Program paused. Press enter to continue.")
 
     # To give an idea of the network's output, you can also run through the
@@ -52,7 +51,7 @@ if __name__ == '__main__':
         plt.show()
 
         pred = predict(Theta1, Theta2, X[rp[i], :])
-        print("Neural network prediction: %d (digit %d)" % (pred, pred % 10))
+        print("Neural network prediction: %d (digit %d)" % (pred, y[rp[i]]))
 
         s = input("Paused - press enter to continue, q to exit.")
         if s == 'q':
