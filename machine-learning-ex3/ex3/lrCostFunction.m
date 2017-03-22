@@ -44,7 +44,7 @@ function [J, grad] = lrCostFunction(theta, X, y, lambda)
     
     % grad(1) isn't regularized
     grad(1) = sum((h - y) .* X(:,1)) / m;
-    grad(2:n) = grad(2:n) + (sum((h - y) .* X(:, 2:n))' + ...
+    grad(2:n) = (sum((h - y) .* X(:, 2:n))' + ...
                     lambda * theta(2:n)) / m;  % regularization term
 % =============================================================
 
