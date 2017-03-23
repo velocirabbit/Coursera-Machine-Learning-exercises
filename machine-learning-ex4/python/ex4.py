@@ -115,7 +115,7 @@ if __name__ == '__main__':
     # if jac = True, costFn is assumed to return the cost as the first return
     # value, and the gradient as the second.
     res = op.minimize(fun = costFn, x0 = initial_nn_params, jac = True,
-                        method = 'TNC', options = {'maxiter': 50})
+                        method = 'TNC', options = {'maxiter': 400})
     cost = res.fun
     nn_params = res.x
 

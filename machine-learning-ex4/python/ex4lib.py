@@ -233,4 +233,4 @@ def predict(theta1, theta2, X):
         np.matmul(np.concatenate([np.ones([m, 1]), h1], axis = 1), np.transpose(theta2))
     )
     p = np.argmax(h2, axis = 1)
-    return p
+    return p + 1  # +1 because Python is 0-indexed
