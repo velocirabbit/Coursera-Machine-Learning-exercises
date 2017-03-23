@@ -33,4 +33,23 @@ theta_t = c(-2, -1, 1, 2)
 X_t = cbind(rep(1, 5), matrix(1:15, nrow = 5) / 10)
 y_t = c(1, 0, 1, 0, 1) >= 0.5
 lambda_t = 3
+cg = lrCostFunction(theta_t, X_t, y_t, lambda_t)
 
+cat("Cost:", cg$cost, "\n")
+cat("Expected cost: 2.534819\n")
+cat("Gradients:\n", cg$grad, "\n")
+cat("Expected gradients:\n 0.146561  -0.548558  0.724722  1.398003\n")
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## ============ Part 2b: One-vs-All Training ============
+cat("Training One-vs-All logistic regression...\n")
+
+lambda = 0.1
+all_theta = oneVsAll(X, y, num_labels, lambda)
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## ================ Part 3: Predict for One-Vs-All ================
+pred = predictOneVsAll(all_theta, X)
+cat("Training set accuracy:", mean(pred == y) * 100, "%\n")

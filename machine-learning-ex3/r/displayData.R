@@ -1,5 +1,8 @@
 displayData = function(X, example_width = 0) {
   if (example_width == 0) {
+    if (length(dim(X)) == 0) {
+      X = t(X)
+    }
     example_width = round(sqrt(dim(X)[2]))
   }
   
