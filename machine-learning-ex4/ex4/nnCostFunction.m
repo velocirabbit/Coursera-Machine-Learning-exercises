@@ -91,7 +91,7 @@ function [J grad] = nnCostFunction(nn_params, ...
         yk = yBinK(i,:);
         dOi = aOuti - yk;
         
-        % ... propagate the error back to next find the error cost in using
+        % ... propagate the error back to find the next error cost in using
         % the current Theta1 values to calculate the hidden layer's
         % activation values.
         d2i_b = dOi * Theta2;   % Propagate output layer error back

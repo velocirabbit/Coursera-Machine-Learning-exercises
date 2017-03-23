@@ -115,7 +115,7 @@ if __name__ == '__main__':
     # if jac = True, costFn is assumed to return the cost as the first return
     # value, and the gradient as the second.
     res = op.minimize(fun = costFn, x0 = initial_nn_params, jac = True,
-                        method = 'BFGS', options = {'maxiter': 50})
+                        method = 'TNC', options = {'maxiter': 50})
     cost = res.fun
     nn_params = res.x
 
@@ -131,6 +131,7 @@ if __name__ == '__main__':
     # units to see what featuers they are capturing in the data.
     print("\nVisualizing neural network...")
     displayData(theta1[:, 1:])
+    plt.show()
     
     input("Program paused. Press enter to continue.")
 

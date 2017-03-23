@@ -106,7 +106,7 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
         dOi = aOuti - yk
 
         ### Back propagation ###
-        # ... propagate the error back to find the error cost in using the
+        # ... propagate the error back to find the next error cost in using the
         # current theta1 values to calculate the hidden layer's activation vals
         d2i_b = np.matmul(dOi, theta2)  # Propagate output layer error back
         d2i = d2i_b[1:] * sigmoidGradient(z2i)  # gradient change
@@ -119,7 +119,7 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
         theta2_grad = theta2_grad + np.matmul(np.transpose(np.array([dOi])),
                                               np.array([a2i]))
         
-        if printing and (i % (m / 100) == 0):
+        if printing and (i % (m / 80) == 0):
             print("=", end = '')
 
     # Add bias unit to each layer
@@ -146,7 +146,7 @@ def nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
 
     grad = np.append(theta1_grad.flatten(), theta2_grad.flatten())
     if printing:
-        print("|")
+        print("| Cost: %g" % J)
     return [J, grad]
 
 # Randomly initialize the weights of a layer with L_in incoming connections and
@@ -213,7 +213,7 @@ def checkNNGradients(lamb = 0):
     # should be very similar
     pprint([numgrad.flatten(), grad.flatten()])
     print("The above two columns should be very similar.")
-    print("(Left: numerical gradient | Right: analytical gradient)")
+    print("  (Left: numerical gradient || Right: analytical gradient)")
 
     # Evaluate the norm of the difference betwen two solutions.
     diff = np.linalg.norm(numgrad - grad) / np.linalg.norm(numgrad + grad)
@@ -224,13 +224,13 @@ def checkNNGradients(lamb = 0):
 # Predict the label of an input given a trained neural network
 def predict(theta1, theta2, X):
     m, n = X.shape
-    num_labels = dim(theta2)[0]
+    num_labels = theta2.shape[0]
 
     h1 = sigmoid(
-        np.matmul(np.concatenate([np.ones(m), X]), np.transpose(theta1))
+        np.matmul(np.concatenate([np.ones([m, 1]), X], axis = 1), np.transpose(theta1))
     )
     h2 = sigmoid(
-        np.matmul(np.concatenate([np.ones(m), h1]), np.transpose(theta2))
+        np.matmul(np.concatenate([np.ones([m, 1]), h1], axis = 1), np.transpose(theta2))
     )
     p = np.argmax(h2, axis = 1)
     return p

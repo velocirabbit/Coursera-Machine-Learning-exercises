@@ -42,3 +42,61 @@ cat("\nFeedforward using neural network...\n")
 lambda = 0
 cg = nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
                     num_labels, X, y, lambda)
+cost = cg$cost
+grad = cg$grad
+
+cat("Cost at parameters:", cost, "\n")
+cat("  (this value should be about 0.287629)\n")
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## =============== Part 4: Implement Regularization ===============
+cat("\nChecking cost function (w/ regularization)...\n")
+
+# Weight regularization parameter (now we set to 1 here)
+lambda = 1
+
+cg = nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
+                    num_labels, X, y, lambda)
+cost = cg$cost
+grad = cg$grad
+
+cat("Cost at parameters:", J, "\n")
+cat("  (this value should be about 0.383770)\n")
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## ================ Part 5: Sigmoid Gradient  ================
+cat("\nEvaluating sigmoid gradient...\n")
+
+g = sigmoidGradient(c(-1, -0.5, 0, 0.5, 1))
+cat("Sigmoid gradient evaluated at c(-1, -0.5, 0, 0.5, 1):\n")
+cat(" ", g, "\n")
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## ================ Part 6: Initializing Pameters ================
+cat("\nInitializing neural network parameters...\n")
+
+initialTheta1 = randInitializeWeights(input_layer_size, hidden_layer_size)
+initialTheta2 = randInitializeWeights(hidden_layer_size, num_labels)
+
+# Unroll parameters
+initial_nn_params = rbind(matrix(initialTheta1, ncol = 1),
+                          matrix(initialTheta2, ncol = 1))
+
+## =============== Part 7: Implement Backpropagation ===============
+cat("\nChecking backpropagation...\n")
+checkNNGradients()
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## =============== Part 8: Implement Regularization ===============
+cat("\nChecking backpropagation (w/ regularization)...\n")
+
+# Check gradients by running checkNNGradients
+lambda = 3
+checkNNGradients(lambda)
+
+# Also output the costFunction debugging values
+
