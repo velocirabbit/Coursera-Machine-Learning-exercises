@@ -40,8 +40,8 @@ if __name__ == '__main__':
 
 ## ============= Part 3: Optimizing using fminunc  =============
     # Run op.minimize() to obtain the optimal theta
-    res = op.minimize(fun = costfn, x0 = initial_theta, args = (X, y),
-                method = 'TNC', jac = gradient, options = {'maxiter': 400})
+    res = op.minimize(fun = costFunction, x0 = initial_theta, args = (X, y),
+                method = 'TNC', jac = True, options = {'maxiter': 400})
     cost = res.fun
     theta = res.x
 

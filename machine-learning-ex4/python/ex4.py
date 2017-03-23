@@ -108,14 +108,13 @@ if __name__ == '__main__':
     print("\nTraining neural network... ")
 
     lamb = 1
-    # This is inefficient, but oh well.
     costFn = lambda p: nnCostFunction(p, input_layer_size, hidden_layer_size,
-                                      num_labels, X, y, lamb, False)[0]
-    gradFn = lambda p: nnCostFunction(p, input_layer_size, hidden_layer_size,
-                                      num_labels, X, y, lamb, True)[1]
+                                      num_labels, X, y, lamb, True)
 
     # op.minimize() requires/works best when x0 is a single vector of type ndarray
-    res = op.minimize(fun = costFn, x0 = initial_nn_params, jac = gradFn,
+    # if jac = True, costFn is assumed to return the cost as the first return
+    # value, and the gradient as the second.
+    res = op.minimize(fun = costFn, x0 = initial_nn_params, jac = True,
                         method = 'BFGS', options = {'maxiter': 50})
     cost = res.fun
     nn_params = res.x

@@ -105,8 +105,9 @@ def oneVsAll(X, y, num_labels, lamb):
     for c in range(num_labels):
         # Run the optimization once for each label using for the solutions y
         # whether or not each training example is equal to the label (y == c)
-        res = op.minimize(fun = lrcostfn, x0 = initial_theta, args = (X, y == c, lamb),
-                    method = 'BFGS', jac = lrgrad, options = {'maxiter': 400})
+        res = op.minimize(fun = lrCostFunction, x0 = initial_theta,
+                          args = (X, y == c, lamb), method = 'BFGS', jac = True,
+                          options = {'maxiter': 400})
         all_theta[c,:] = res.x
 
     return all_theta
