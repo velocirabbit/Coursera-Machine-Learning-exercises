@@ -1,7 +1,6 @@
 ## Machine Learning Online Class (Python implementation) - Exercise 3 | Part 1: One-vs-all
 import matplotlib.pyplot as plt
 import numpy as np
-import random
 import scipy.io as sio
 from ex3lib import *
 
@@ -12,14 +11,14 @@ if __name__ == '__main__':
 
 ## =========== Part 1: Loading and Visualizing Data =============
     # Load training data
-    print("Loading and visualizing data...")
+    print("\nLoading and visualizing data...")
     data = sio.loadmat('ex3data1')  # training data stored in arrays X and y
     X = data["X"]
     y = data["y"]
     m, n = X.shape  # m = number of training examples, n = parameters
 
     # Randomly select 100 data points to display
-    rand_indices = random.sample(range(m), k = 100)
+    rand_indices = np.random.choice(m, size = 100, replace = False)
     sel = X[rand_indices, :]
 
     displayData(sel)
@@ -28,7 +27,7 @@ if __name__ == '__main__':
     input("Program paused. Press enter to continue.")
 
 ## ============ Part 2a: Vectorize Logistic Regression ============
-    print("Testing lrCostFunction()")
+    print("\nTesting lrCostFunction()")
 
     # Test case for lrCostFunction
     theta_t = np.array([[-2], [-1], [1], [2]])
@@ -48,7 +47,7 @@ if __name__ == '__main__':
     input("Program paused. Press enter to continue.")
 
 ## ============ Part 2b: One-vs-All Training ============
-    print("Training One-vs-All logistic regression...")
+    print("\nTraining One-vs-All logistic regression...")
 
     lamb = 0.1
     all_theta = oneVsAll(X, y, num_labels, lamb)
@@ -56,4 +55,4 @@ if __name__ == '__main__':
     print(all_theta)
 ## ================ Part 3: Predict for One-Vs-All ================
     pred = predictOneVsAll(all_theta, X)
-    print("Training set accuracy: %.3f" % (np.mean(pred == np.reshape(y, [m, 1])) * 100))
+    print("\nTraining set accuracy: %.3f" % (np.mean(pred == np.reshape(y, [m, 1])) * 100))
