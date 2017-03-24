@@ -14,7 +14,7 @@ checkNNGradients = function(lambda = 0) {
   
   # Unroll parameters
   nn_params = rbind(matrix(theta1, ncol = 1), matrix(theta2, ncol = 1))
-  
+
   # Use an anonymous function to make cost function shorthand
   costFunc = function(p) nnCostFunction(p, input_layer_size, hidden_layer_size,
                                         num_labels, X, y, lambda)

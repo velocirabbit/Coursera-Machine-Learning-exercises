@@ -118,7 +118,7 @@ function [J grad] = nnCostFunction(nn_params, ...
     
     % Calculate the output values
     aOut = sigmoid(a2 * Theta2');
-    
+
     % Unregularized cost
     J = -sum(sum(yBinK .* log(aOut) + (1 - yBinK) .* log(1 - aOut))) / m;
     % Regularization term

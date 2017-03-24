@@ -61,7 +61,7 @@ cg = nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
 cost = cg$cost
 grad = cg$grad
 
-cat("Cost at parameters:", J, "\n")
+cat("Cost at parameters:", cost, "\n")
 cat("  (this value should be about 0.383770)\n")
 
 readline(prompt = "Program paused. Press enter to continue.")
@@ -72,6 +72,8 @@ cat("\nEvaluating sigmoid gradient...\n")
 g = sigmoidGradient(c(-1, -0.5, 0, 0.5, 1))
 cat("Sigmoid gradient evaluated at c(-1, -0.5, 0, 0.5, 1):\n")
 cat(" ", g, "\n")
+cat("(these values should be:)\n")
+cat("  0.196612 0.235004 0.25 0.235004 0.196612")
 
 readline(prompt = "Program paused. Press enter to continue.")
 
@@ -99,4 +101,55 @@ lambda = 3
 checkNNGradients(lambda)
 
 # Also output the costFunction debugging values
+debug_cg = nnCostFunction(nn_params, input_layer_size, hidden_layer_size,
+                          num_labels, X, y, lambda)$cost
+cat("Cost at (fixed) debugging parameters (w/ lambda =", lambda, "):", debug_cg, "\n")
+cat("  (for lambda = 3, this value should be about 0.576051)\n")
 
+readline(prompt = "Program paused. Press enter to continue.")
+
+## =================== Part 9: Training NN ===================
+cat("\nTraining neural network...\n")
+
+lambda = 1
+
+getCostGrad = function(p, getNew) {
+  if (getNew) {
+    assign("getCG", nnCostFunction(p, nn_params, input_layer_size,
+                                   hidden_layer_size, num_labels, X, y, lambda),
+           envir = .GlobalEnv)
+    return(getCG$cost)
+  }
+  else {
+    return(getCG$grad)
+  }
+}
+
+getCost = function(p) getCostGrad(p, T)
+getGrad = function(p) getCostGrad(p, F)
+
+# optim() doesn't have a TNC optimization method
+res = optim(initial_nn_params, fn = getCost, gr = getGrad, method = 'BFGS')
+nn_params = res$par
+cost = res$value
+
+# Obtain theta1 and theta2 back from nn_params
+paramunroll = hidden_layer_size * (input_layer_size + 1)
+theta1 = matrix(nn_params[1:paramunroll],
+                nrow = hidden_layer_size, ncol = input_layer_size + 1)
+theta2 = matrix(nn_params[1 + paramunroll:length(nn_params)],
+                nrow = num_labels, ncol = hidden_layer_size + 1)
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## ================= Part 10: Visualize Weights =================
+cat("\nVisualizing neural network...\n")
+
+displayData(theta1[,-1])
+
+readline(prompt = "Program paused. Press enter to continue.")
+
+## ================= Part 11: Implement Predict =================
+pred = predict(theta1, theta2, X)
+
+cat("\nTraining set accuracy:", mean(pred == y) * 100, "%\n")

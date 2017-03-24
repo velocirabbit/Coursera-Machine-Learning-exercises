@@ -109,13 +109,13 @@ if __name__ == '__main__':
 
     lamb = 1
     costFn = lambda p: nnCostFunction(p, input_layer_size, hidden_layer_size,
-                                      num_labels, X, y, lamb, True)
+                                      num_labels, X, y, lamb, False)
 
     # op.minimize() requires/works best when x0 is a single vector of type ndarray
     # if jac = True, costFn is assumed to return the cost as the first return
     # value, and the gradient as the second.
     res = op.minimize(fun = costFn, x0 = initial_nn_params, jac = True,
-                        method = 'TNC', options = {'maxiter': 400})
+                        method = 'TNC', options = {'maxiter': 250})
     cost = res.fun
     nn_params = res.x
 
