@@ -16,7 +16,7 @@ data = readMat('ex3data1.mat')
 X = data$X
 y = data$y
 
-m = dim(X)[1]  # Number of training examples
+m = nrow(X)  # Number of training examples
 
 # Randomly select 100 data points to display
 rand_indices = sample(m, 100)
