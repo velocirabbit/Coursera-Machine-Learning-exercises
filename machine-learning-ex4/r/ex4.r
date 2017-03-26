@@ -113,6 +113,17 @@ cat("\nTraining neural network...\n")
 
 lambda <- 1
 
+# Optimize using fmincg:
+cat("\n  Training via fmincg...\n")
+costFn = function(p) nnCostFunction(p, input_layer_size, hidden_layer_size,
+                                    num_labels, X, y, lambda, F)
+options = c(MaxIter = 250)
+fcg = fmincg(costFn, initial_nn_params, options)
+nn_params_fmincg = fcg$params
+cost_fmincg = fcg$cost
+
+# Optimize using optim()
+cat("\n  Training via optim...\n")
 getCostGrad = function(p, getNew) {
   # We'll save the output from nnCostFunction to global variable getCG, then use
   # getNew to denote whether or not we want to run nnCostFunction again. This
@@ -123,8 +134,7 @@ getCostGrad = function(p, getNew) {
                                    num_labels, X, y, lambda, T),
            envir = .GlobalEnv)
     return(getCG$cost)
-  }
-  else {
+  } else {
     return(getCG$grad)
   }
 }
@@ -135,8 +145,19 @@ getGrad <- function(p) getCostGrad(p, F)
 # optim() doesn't have a TNC optimization method
 res <- optim(initial_nn_params, fn = getCost, gr = getGrad,
              method = 'BFGS', control = list(maxit = 250))
-nn_params <- res$par
-cost <- res$value
+nn_params_optim <- res$par
+cost_optim <- res$value
+
+cat("\nCost via fmincg:", cost_fmincg[length(cost_fmincg)])
+cat("\nCost via optim: ", cost_optim, "\n")
+
+if (cost_fmincg[length(cost_fmincg)] < cost_optim) {
+  cost = cost_fmincg[length(cost_fmincg)]
+  nn_params = nn_params_fmincg
+} else {
+  cost = cost_optim
+  nn_params = nn_params_optim
+}
 
 # Obtain theta1 and theta2 back from nn_params
 paramunroll <- hidden_layer_size * (input_layer_size + 1)

@@ -269,12 +269,12 @@ def fmincg(f, X, options = None):
     if options is not None:
         if 'MaxIter' in options:
             length = options['MaxIter']
-        else
+        else:
             length = 100
 
         if 'Print' in options:
             printing = options['Print']
-        else
+        else:
             printing = True
 
     # A bunch of constants for line searches
@@ -336,7 +336,7 @@ def fmincg(f, X, options = None):
                     else:
                         # Cubic fit
                         A = 6*(f2 - f3)/z3 + 3*(d2 + d3)
-                        B = 3*(f3 - f2) * z3*(d3 + 2*d2)
+                        B = 3*(f3 - f2) - z3*(d3 + 2*d2)
                         z2 = (np.sqrt(B**2 - A*d2*z3*z3) - B)/A
                     
                     # If we had a numerical problem, then bisect
@@ -364,7 +364,7 @@ def fmincg(f, X, options = None):
                 z2 = -d2*z3*z3/(B + np.sqrt(B*B - A*d2*z3*z3))
 
                 if not np.isreal(z2) or np.isnan(z2) or np.isinf(z2) or z2 < 0:
-                    # Num prob or wrong sign?
+                    # Numerical problem or wrong sign?
                     if limit < -0.5:        # If we have no upper limit...
                         z2 = z1*(EXT - 1)   # ... then extrapolate the maximum amount
                     else:
@@ -409,7 +409,7 @@ def fmincg(f, X, options = None):
                 d1 = d2
                 ls_failed = 0   # This line search didn't fail
             else:
-                X = X0; f1 = f0; df1 = df0  # Restore point form before failed line search
+                X = X0; f1 = f0; df1 = df0  # Restore point from before failed line search
                 if ls_failed or i > abs(length):
                     # Line search failed twice in a row
                     break
