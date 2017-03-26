@@ -266,15 +266,16 @@ def fmincg(f, X, options = None):
     ogshape = X.shape
     X = X.flatten()
 
-    if options is not None and 'MaxIter' in options:
-        length = options['MaxIter']
-    else:
-        length = 100
+    if options is not None:
+        if 'MaxIter' in options:
+            length = options['MaxIter']
+        else
+            length = 100
 
-    if options is not None and 'Print' in options:
-        printing = options['Print']
-    else:
-        printing = True
+        if 'Print' in options:
+            printing = options['Print']
+        else
+            printing = True
 
     # A bunch of constants for line searches
     RHO = 0.01      # RHO and SIG are the constants in the Wolfe-Powell conditions
@@ -289,8 +290,8 @@ def fmincg(f, X, options = None):
 
     # Check to see if the optional function reduction value is given
     if hasattr(length, 'shape') and np.max(length.shape) == 2:
-        red = length[2]
-        length = length[1]
+        red = length[1]
+        length = length[0]
     else:
         red = 1
     S = 'Iteration '    # for printing progress log to output
