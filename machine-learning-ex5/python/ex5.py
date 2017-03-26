@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
 ## =========== Part 3: Regularized Linear Regression Gradient =============
     # This part is identical to Part 2, but this time print the gradient.
-    print("\nGradient: ", grad)
+    print("\nGradient: ", grad.flatten())
     print("  (should be [-15.3030; 598.2507])")
 
     input("Program paused. Press enter to continue.")

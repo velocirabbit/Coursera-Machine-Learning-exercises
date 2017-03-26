@@ -111,13 +111,33 @@ if __name__ == '__main__':
     costFn = lambda p: nnCostFunction(p, input_layer_size, hidden_layer_size,
                                       num_labels, X, y, lamb, False)
 
+    # Using fmincg:
+    print("\n  Training via fmincg...")
+    options = {'MaxIter': 250}
+    nn_params_fmincg, cost_fmincg, __ = fmincg(costFn, initial_nn_params, options)
+    # Using op.minimize():
     # op.minimize() requires/works best when x0 is a single vector of type ndarray
     # if jac = True, costFn is assumed to return the cost as the first return
     # value, and the gradient as the second.
+    costFn = lambda p: nnCostFunction(p, input_layer_size, hidden_layer_size,
+                                      num_labels, X, y, lamb, True)
+    print("\n  Training via op.minimize()...")
     res = op.minimize(fun = costFn, x0 = initial_nn_params, jac = True,
                         method = 'TNC', options = {'maxiter': 250})
-    cost = res.fun
-    nn_params = res.x
+    nn_params_opmin = res.x
+    cost_opmin = res.fun
+
+    print("\n")
+    print("Cost via fmincg:        %.6f" % cost_fmincg[-1])
+    print("Cost via op.minimize(): %.6f" % cost_opmin)
+    print("\n")
+
+    if cost_fmincg[-1] < cost_opmin:
+        cost = cost_fmincg[-1]
+        nn_params = nn_params_fmincg
+    else:
+        cost = cost_opmin
+        nn_params = nn_params_opmin
 
     # Obtain theta1 and theta2 back from nn_params
     paramunroll = hidden_layer_size * (input_layer_size + 1)
