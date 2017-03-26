@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 import scipy.optimize as op
+from ex6lib import *
 
 if __name__ == '__main__':
 ## =============== Part 1: Loading and Visualizing Data ================
@@ -28,5 +29,6 @@ if __name__ == '__main__':
     C = 100
     model = svmTrain(X, y, C, linearKernel, 1e-3, 20)
     visualizeBoundaryLinear(X, y, model)
+    plt.show()
 
     input("Program paused. Press enter to continue.")

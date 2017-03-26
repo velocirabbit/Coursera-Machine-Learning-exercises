@@ -1,14 +1,15 @@
 # Library file for ex6
 import matplotlib.pyplot as plt
 import numpy as np
+from SVM_Model import SVM_Model
 
 # Plots the data points X and y into a new figure
 def plotData(X, y):
-    pos = y == 1
-    neg = y == 0
+    pos = (y == 1).flatten()
+    neg = (y == 0).flatten()
 
-    plot(X[pos, 0], X[pos, 1], 'k+', linewidth = 1, markersize = 7)
-    plot(X[neg, 0], X[pos, 1], 'ko', markersize = 7, markerfacecolor = 'y')
+    plt.plot(X[pos, 0], X[pos, 1], 'k+', linewidth = 1, markersize = 7)
+    plt.plot(X[neg, 0], X[neg, 1], 'ko', markersize = 7, markerfacecolor = 'y')
 
 # Trains an SVM classifier using a simplified version of the SMO algorithm
 def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
@@ -33,3 +34,150 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
     #
     # We have implemented optimized vectorized version of the kernels here so
     # that the SVM training will run faster
+    if kernelFunction.__name__ == 'linearKernel':
+        # Vectorized computation for the linear kernel
+        # This is equivalent to computing the kernel on every pair of examples
+        K = np.matmul(X, np.transpose(X))
+    elif kernelFunction.__name__ == 'gaussianKernel':
+        # Vectorized RBF (radial basis function, i.e. Gaussian) kernel
+        # This is equivalent to computing the kernel on every pair of examples
+        X2 = np.reshape(np.sum(X**2, axis = 1), [X.shape[0], 1])
+        K = X2 + (np.transpose(X2) - 2*np.matmul(X, np.transpose(X)))
+        K = kernelFunction(1, 0)**K
+    else:
+        # Pre-compute the kernel matrix
+        # This can be slow due to the lack of vectorization
+        K = np.zeros([m, m])
+        for i in range(m):
+            for j in range(i, m):
+                K[i, j] = kernelFunction(
+                    np.transpose(X[i,:]), np.transpose(X[j,:])
+                )
+                K[j, i] = K[i, j]  # the matrix is symmetric
+
+    # Train
+    print("\nTraining", end = '')
+    dots = 12
+    while passes < max_passes:
+        num_changed_alphas = 0
+        for i in range(m):
+            # Calculate Ei = f(x[i]) - y[i]
+            # E[i] = b + sum(X[i,:] * np.transpose(np.tile(alphas*Y, 1, n) * X) - Y[i]
+            E[i] = b + np.sum(alphas*Y.flatten()*K[:,i]) - Y[i]
+
+            if (Y[i]*E[i] < -tol and alphas[i] < C) or (Y[i]*E[i] > tol and alphas[i] > 0):
+                # In practice, there are many heuristics one can use to select
+                # the i and j. In this simplified code, we select them randomly.
+                j = np.floor(m * np.random.rand())
+                while j == i:  # Make sure i != j
+                    j = np.floor(m * np.random.rand())
+                
+                # Calculate E[j] = f(x[j]) - y[j]
+                E[j] = b + np.sum(alphas*Y.flatten()*K[:,j]) - Y[j]
+
+                # Save old alphas
+                alpha_i_old = alphas[i]
+                alpha_j_old = alphas[j]
+
+                # Compute L and H
+                if Y[i] == Y[j]:
+                    L = max(0, alphas[j] + alphas[i] - C)
+                    H = min(C, alphas[j] + alphas[i])
+                else:
+                    L = max(0, alphas[j] - alphas[i])
+                    H = min(C, C + alphas[j] - alphas[i])
+                
+                if L == H:
+                    # Continue to the next i
+                    continue
+                
+                # Compute eta
+                eta = 2*K[i, j] - K[i, i] - K[j, j]
+                if eta >= 0:
+                    # Continue to next i
+                    continue
+
+                # Compute and clip new value for alpha j
+                alphas[j] = alphas[j] - (Y[j]*(E[i] - E[j]))/eta
+
+                # Clip
+                alphas[j] = min(H, alphas[j])
+                alphas[j] = max(L, alphas[j])
+
+
+                # Check if change in alpha is significant
+                if np.abs(alphas[j] - alpha_j_old) < tol:
+                    # Continue to next i, but still replace anyway
+                    alphas[j] = alpha_j_old
+                    continue
+
+                # Determine value for alpha i
+                alphas[i] = alphas[i] + Y[i]*Y[j]*(alpha_j_old - alphas[j])
+
+                # Compute b1 and b2
+                b1 = b - E[i] - \
+                        Y[i]*(alphas[i] - alphs_i_old)*np.transpose(K[i, j]) - \
+                        Y[j]*(alphas[j] - alpha_j_old)*np.transpose(K[i, j])
+                b2 = b - E[j] - \
+                        Y[i]*(alphas[i] - alpha_i_old)*np.transpose(K[i, j]) - \
+                        Y[j]*(alphas[j] - alpha_j_old)*np.transpose(K[j, j])
+
+                # Compute b
+                if 0 < alphas[i] and alphas[i] < C:
+                    b = b1
+                elif 0 < alphas[j] and alphas[j] < C:
+                    b = b2
+                else:
+                    b = (b1 + b2)/2
+
+                num_changed_alphas = num_changed_alphas + 1
+
+        if num_changed_alphas == 0:
+            passes += 1
+        else:
+            passes = 0
+
+        print(".", end = '')
+        dots += 1
+        if dots > 78:
+            dots = 0
+            print("")
+
+    print(" Done! \n")
+    
+    # Save the model
+    idx = (alphas > 0).flatten()
+
+    model = SVM_Model(kernelFunction, X, Y, alphas, b, idx)
+
+    return model
+
+# Plots a linear decision boundary learned by the SVM
+def visualizeBoundaryLinear(X, y, model):
+    w = model.w
+    b = model.b
+
+    xp = np.linspace(min(X[:,0]), max(X[:,0]), 100)
+    yp = -(w[0]*xp + b)/w[1]
+    plotData(X, y)
+    plt.plot(xp, yp, '-b')
+
+# Returns a linear kernel between x1 and x2
+def linearKernel(x1, x2):
+    # Ensure that x1 and x2 are column vectors
+    x1 = np.reshape(x1, [x1.size, 1])
+    x2 = np.reshape(x2, [x2.size, 1])
+
+    # Compute the kernel
+    sim = np.matmul(np.transpose(x1), x2)
+    return sim
+
+# Returns a radial basis function kernel between x1 and x2
+def gaussianKernel(x1, x2, sigma):
+    # Ensure that x1 and x2 are column vectors
+    x1 = np.reshape(x1, [x1.size, 1])
+    x2 = np.reshape(x2, [x2.size, 1])
+
+    # Compute the kernel
+    sim = np.exp(-np.sum((x1 - x2)**2, axis = 0) / (2 * sigma**2))
+    return sim

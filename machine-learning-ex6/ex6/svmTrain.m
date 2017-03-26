@@ -75,21 +75,20 @@ end
 % Train
 fprintf('\nTraining ...');
 dots = 12;
-while passes < max_passes,
+while passes < max_passes
             
     num_changed_alphas = 0;
-    for i = 1:m,
+    for i = 1:m
         
         % Calculate Ei = f(x(i)) - y(i) using (2). 
         % E(i) = b + sum (X(i, :) * (repmat(alphas.*Y,1,n).*X)') - Y(i);
         E(i) = b + sum (alphas.*Y.*K(:,i)) - Y(i);
         
-        if ((Y(i)*E(i) < -tol && alphas(i) < C) || (Y(i)*E(i) > tol && alphas(i) > 0)),
-            
+        if ((Y(i)*E(i) < -tol && alphas(i) < C) || (Y(i)*E(i) > tol && alphas(i) > 0))          
             % In practice, there are many heuristics one can use to select
             % the i and j. In this simplified code, we select them randomly.
             j = ceil(m * rand());
-            while j == i,  % Make sure i \neq j
+            while j == i  % Make sure i \neq j
                 j = ceil(m * rand());
             end
 
@@ -101,7 +100,7 @@ while passes < max_passes,
             alpha_j_old = alphas(j);
             
             % Compute L and H by (10) or (11). 
-            if (Y(i) == Y(j)),
+            if (Y(i) == Y(j))
                 L = max(0, alphas(j) + alphas(i) - C);
                 H = min(C, alphas(j) + alphas(i));
             else
@@ -109,14 +108,14 @@ while passes < max_passes,
                 H = min(C, C + alphas(j) - alphas(i));
             end
            
-            if (L == H),
+            if (L == H)
                 % continue to next i. 
                 continue;
             end
 
             % Compute eta by (14).
             eta = 2 * K(i,j) - K(i,i) - K(j,j);
-            if (eta >= 0),
+            if (eta >= 0)
                 % continue to next i. 
                 continue;
             end
@@ -129,7 +128,7 @@ while passes < max_passes,
             alphas(j) = max (L, alphas(j));
             
             % Check if change in alpha is significant
-            if (abs(alphas(j) - alpha_j_old) < tol),
+            if (abs(alphas(j) - alpha_j_old) < tol)
                 % continue to next i. 
                 % replace anyway
                 alphas(j) = alpha_j_old;
@@ -148,9 +147,9 @@ while passes < max_passes,
                  - Y(j) * (alphas(j) - alpha_j_old) *  K(j,j)';
 
             % Compute b by (19). 
-            if (0 < alphas(i) && alphas(i) < C),
+            if (0 < alphas(i) && alphas(i) < C)
                 b = b1;
-            elseif (0 < alphas(j) && alphas(j) < C),
+            elseif (0 < alphas(j) && alphas(j) < C)
                 b = b2;
             else
                 b = (b1+b2)/2;
@@ -162,7 +161,7 @@ while passes < max_passes,
         
     end
     
-    if (num_changed_alphas == 0),
+    if (num_changed_alphas == 0)
         passes = passes + 1;
     else
         passes = 0;
