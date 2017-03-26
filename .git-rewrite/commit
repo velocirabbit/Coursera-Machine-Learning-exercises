@@ -1,0 +1,8 @@
+tree 103f650a53a044da6cf7b01641cf2dedbeb76ec0
+parent 75c4470c7a6e6effe7ed03974f5dffd807b729fa
+author velocirabbit <www.velocirabbit@gmail.com> 1490224236 -0500
+committer velocirabbit <www.velocirabbit@gmail.com> 1490224236 -0500
+
+ex3 python
+
+Fixed a small bug with rotated images.
