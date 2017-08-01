@@ -303,7 +303,7 @@ def fmincg(f, X, options = None):
     i += length < 0                         # Count epochs?!
     s = -df1                                # Search direction is steepest
     d1 = np.matmul(-np.transpose(s), s)     # This is the slope
-    z1 = red / (1 - d1)                     # Initial ste is: red/(|s| + 1)
+    z1 = red / (1 - d1)                     # Initial step is: red/(|s| + 1)
 
     # Main body of optimization loop
     # Ignore RuntimeWarnings due to numerical errors

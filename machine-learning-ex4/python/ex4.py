@@ -16,7 +16,8 @@ if __name__ == '__main__':
     X = data['X']
     y = data['y']
     m, n = X.shape
-
+    print('Number of training examples:', m)
+    print('Pixels in image:', n)
     # Randomly select 100 data points to display
     rand_indices = np.random.choice(m, size = 100, replace = False)
     sel = X[rand_indices, :]

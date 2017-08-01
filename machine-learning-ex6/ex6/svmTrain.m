@@ -158,7 +158,6 @@ while passes < max_passes
             num_changed_alphas = num_changed_alphas + 1;
 
         end
-        
     end
     
     if (num_changed_alphas == 0)
@@ -178,7 +177,7 @@ while passes < max_passes
     end
 end
 fprintf(' Done! \n\n');
-
+E
 % Save the model
 idx = alphas > 0;
 model.X= X(idx,:);

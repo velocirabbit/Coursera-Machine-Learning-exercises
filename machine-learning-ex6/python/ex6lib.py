@@ -15,7 +15,7 @@ def plotData(X, y):
 def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
     # Data parameters
     m, n = X.shape
-
+    
     # Map 0 to -1
     Y[Y == 0] = -1
 
@@ -54,7 +54,7 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
                     np.transpose(X[i,:]), np.transpose(X[j,:])
                 )
                 K[j, i] = K[i, j]  # the matrix is symmetric
-
+    
     # Train
     print("\nTraining", end = '')
     dots = 12
@@ -64,14 +64,14 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
             # Calculate Ei = f(x[i]) - y[i]
             # E[i] = b + sum(X[i,:] * np.transpose(np.tile(alphas*Y, 1, n) * X) - Y[i]
             E[i] = b + np.sum(alphas*Y.flatten()*K[:,i]) - Y[i]
-
+            
             if (Y[i]*E[i] < -tol and alphas[i] < C) or (Y[i]*E[i] > tol and alphas[i] > 0):
                 # In practice, there are many heuristics one can use to select
                 # the i and j. In this simplified code, we select them randomly.
-                j = np.floor(m * np.random.rand())
+                j = np.floor(m * np.random.rand()).astype(int)
                 while j == i:  # Make sure i != j
-                    j = np.floor(m * np.random.rand())
-                
+                    j = np.floor(m * np.random.rand()).astype(int)
+
                 # Calculate E[j] = f(x[j]) - y[j]
                 E[j] = b + np.sum(alphas*Y.flatten()*K[:,j]) - Y[j]
 
@@ -144,7 +144,7 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
             print("")
 
     print(" Done! \n")
-    
+    print(E)
     # Save the model
     idx = (alphas > 0).flatten()
 
