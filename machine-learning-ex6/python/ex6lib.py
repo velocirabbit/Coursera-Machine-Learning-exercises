@@ -1,6 +1,7 @@
 # Library file for ex6
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 from SVM_Model import SVM_Model
 
 # Plots the data points X and y into a new figure
@@ -17,12 +18,13 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
     m, n = X.shape
     
     # Map 0 to -1
+    Y = Y.flatten()
     Y[Y == 0] = -1
 
     # Variables
-    alphas = np.zeros([m, 1])
+    alphas = np.zeros([m,])
     b = 0
-    E = np.zeros([m, 1])
+    E = np.zeros([m,])
     passes = 0
     eta = 0
     L = 0
@@ -37,12 +39,12 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
     if kernelFunction.__name__ == 'linearKernel':
         # Vectorized computation for the linear kernel
         # This is equivalent to computing the kernel on every pair of examples
-        K = np.matmul(X, np.transpose(X))
+        K = np.matmul(X, X.T)
     elif kernelFunction.__name__ == 'gaussianKernel':
         # Vectorized RBF (radial basis function, i.e. Gaussian) kernel
         # This is equivalent to computing the kernel on every pair of examples
-        X2 = np.reshape(np.sum(X**2, axis = 1), [X.shape[0], 1])
-        K = X2 + (np.transpose(X2) - 2*np.matmul(X, np.transpose(X)))
+        X2 = np.sum(X**2, axis = 1)
+        K = X2 + (X2.T - 2*np.matmul(X, X.T))
         K = kernelFunction(1, 0)**K
     else:
         # Pre-compute the kernel matrix
@@ -51,19 +53,19 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
         for i in range(m):
             for j in range(i, m):
                 K[i, j] = kernelFunction(
-                    np.transpose(X[i,:]), np.transpose(X[j,:])
+                    X[i,:].T, X[j,:].T
                 )
                 K[j, i] = K[i, j]  # the matrix is symmetric
     
     # Train
-    print("\nTraining", end = '')
+    print("\nTraining", end = ''); sys.stdout.flush()
     dots = 12
     while passes < max_passes:
         num_changed_alphas = 0
         for i in range(m):
             # Calculate Ei = f(x[i]) - y[i]
             # E[i] = b + sum(X[i,:] * np.transpose(np.tile(alphas*Y, 1, n) * X) - Y[i]
-            E[i] = b + np.sum(alphas*Y.flatten()*K[:,i]) - Y[i]
+            E[i] = b + np.sum(alphas*Y*K[:,i]) - Y[i]
             
             if (Y[i]*E[i] < -tol and alphas[i] < C) or (Y[i]*E[i] > tol and alphas[i] > 0):
                 # In practice, there are many heuristics one can use to select
@@ -73,7 +75,7 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
                     j = np.floor(m * np.random.rand()).astype(int)
 
                 # Calculate E[j] = f(x[j]) - y[j]
-                E[j] = b + np.sum(alphas*Y.flatten()*K[:,j]) - Y[j]
+                E[j] = b + np.sum(alphas*Y*K[:,j]) - Y[j]
 
                 # Save old alphas
                 alpha_i_old = alphas[i]
@@ -116,16 +118,16 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
 
                 # Compute b1 and b2
                 b1 = b - E[i] - \
-                        Y[i]*(alphas[i] - alphs_i_old)*np.transpose(K[i, j]) - \
-                        Y[j]*(alphas[j] - alpha_j_old)*np.transpose(K[i, j])
+                        Y[i]*(alphas[i] - alpha_i_old) * K[i, j].T - \
+                        Y[j]*(alphas[j] - alpha_j_old) * K[i, j].T
                 b2 = b - E[j] - \
-                        Y[i]*(alphas[i] - alpha_i_old)*np.transpose(K[i, j]) - \
-                        Y[j]*(alphas[j] - alpha_j_old)*np.transpose(K[j, j])
+                        Y[i]*(alphas[i] - alpha_i_old) * K[i, j].T - \
+                        Y[j]*(alphas[j] - alpha_j_old) * K[j, j].T
 
                 # Compute b
-                if 0 < alphas[i] and alphas[i] < C:
+                if 0 < alphas[i] < C:
                     b = b1
-                elif 0 < alphas[j] and alphas[j] < C:
+                elif 0 < alphas[j] < C:
                     b = b2
                 else:
                     b = (b1 + b2)/2
@@ -137,20 +139,33 @@ def svmTrain(X, Y, C, kernelFunction, tol = 1e-3, max_passes = 5):
         else:
             passes = 0
 
-        print(".", end = '')
+        print(".", end = ''); sys.stdout.flush()
         dots += 1
         if dots > 78:
             dots = 0
-            print("")
+            print(""); sys.stdout.flush()
 
     print(" Done! \n")
     print(E)
     # Save the model
-    idx = (alphas > 0).flatten()
+    idx = alphas > 0
 
     model = SVM_Model(kernelFunction, X, Y, alphas, b, idx)
 
     return model
+
+# Returns a vector of predictions using a trained SVM model (via svmTrain).
+def svmPredict(model, X):
+    return None  #TODO: finish this
+
+# Plots a non-linear decision boundary learned by the SVM.
+def visualizeBoundary(X, y, model, varargin):
+    # Plot the training data on top of the boundary
+    plotData(X, y)
+    # Make classification predictions over a grid of values
+    x1plot = np.linspace(min(X[:,0]), max(X[:,0]), 100)
+    x2plot = np.linspace(min(X[:,1]), max(X[:,1]), 100)
+    #TODO: Finish this
 
 # Plots a linear decision boundary learned by the SVM
 def visualizeBoundaryLinear(X, y, model):
@@ -169,7 +184,7 @@ def linearKernel(x1, x2):
     x2 = np.reshape(x2, [x2.size, 1])
 
     # Compute the kernel
-    sim = np.matmul(np.transpose(x1), x2)
+    sim = np.matmul(x1.T, x2)
     return sim
 
 # Returns a radial basis function kernel between x1 and x2
@@ -181,3 +196,18 @@ def gaussianKernel(x1, x2, sigma):
     # Compute the kernel
     sim = np.exp(-np.sum((x1 - x2)**2, axis = 0) / (2 * sigma**2))
     return sim
+
+# Reads the fixed vocabulary list in vocab.txt and returns a cell array of the
+# words.
+def getVocabList():
+    with open('vocab.txt', 'r') as f:
+        vocabList = [line.split()[1] for line in f]
+    return vocabList
+
+# Reads a file and returns its entire contents
+def readFile(filename):
+    try:
+        return open(filename, 'r').read()
+    except:
+        print('Unable to open %s' % filename)
+        return ''

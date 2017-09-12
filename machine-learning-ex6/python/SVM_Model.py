@@ -9,6 +9,4 @@ class SVM_Model:
         self.y = y[idx]
         self.b = b
         self.alphas = alphas[idx]
-        self.w = np.transpose(np.matmul(
-            np.transpose(alphas*y), X
-        ))
+        self.w = np.matmul(np.transpose(alphas*y), X).T
